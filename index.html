@@ -255,6 +255,43 @@
   <!-- GRADIENT -->
   <div class="op-showcase reveal" style="margin-top:1.5rem;">
     <div class="op-showcase-title">Morphological Gradient</div>
+    <div class="oc-diagram">
+      <!-- Top: original -->
+      <div class="oc-top">
+        <div class="oc-node">
+          <canvas id="ops-grad-orig"></canvas>
+          <div class="op-canvas-lbl">Original</div>
+        </div>
+      </div>
+      <!-- Mid arrows -->
+      <div class="oc-mid-arrows">
+        <div class="oc-branch-label left"><span style="color:var(--accent)">dilation ↓</span></div>
+        <div class="oc-branch-label right"><span style="color:var(--accent)">erosion ↓</span></div>
+      </div>
+      <!-- Mid: intermediates -->
+      <div class="oc-mid">
+        <div class="oc-node">
+          <canvas id="ops-grad-dilate"></canvas>
+          <div class="op-canvas-lbl">After Dilation</div>
+        </div>
+        <div class="oc-node">
+          <canvas id="ops-grad-erode"></canvas>
+          <div class="op-canvas-lbl">After Erosion</div>
+        </div>
+      </div>
+      <!-- Bot arrows to single point -->
+      <div class="oc-mid-arrows" style="justify-content:center; align-items:center; margin-top:0.5rem;">
+        <span style="font-weight:700; color:var(--text); background:var(--bg-card); border:1px solid var(--border); padding:0.2rem 0.5rem; border-radius:4px;">Dilation − Erosion</span>
+      </div>
+      <div style="text-align:center; color:var(--accent); margin-bottom:0.5rem;">↓</div>
+      <!-- Bot: results -->
+      <div class="oc-bot" style="justify-content:center;">
+        <div class="oc-node">
+          <canvas id="ops-grad-out"></canvas>
+          <div class="op-canvas-lbl" style="font-weight:700; color:var(--text);">Morphological Gradient</div>
+        </div>
+      </div>
+    </div>
     <div class="oc-bullets-row" style="margin-top: 1rem;">
       <div class="oc-bullet-block" style="width:100%;">
         <strong>Gradient</strong> = Dilation − Erosion

@@ -892,6 +892,16 @@ function renderOpShowcases() {
   const opened   = applyMorphOp(applyMorphOp(src, ker, 'erosion'),  ker, 'dilation');
   const closed   = applyMorphOp(applyMorphOp(src, ker, 'dilation'), ker, 'erosion');
 
+  // Gradient = Dilation - Erosion logic
+  const gradient = [];
+  for (let r=0; r<src.length; r++) {
+    const row = [];
+    for (let c=0; c<src[0].length; c++) {
+      row.push(dilated[r][c] && !eroded[r][c] ? 1 : 0);
+    }
+    gradient.push(row);
+  }
+
   // Erosion
   drawOpCanvasDark('ops-erosion-in',   src);
   drawOpCanvasDark('ops-erosion-out',  eroded);
@@ -904,6 +914,11 @@ function renderOpShowcases() {
   drawOpCanvasDark('ops-opening-mid',  eroded);   // opening path: erode first
   drawOpCanvasDark('ops-closing-out',  closed);
   drawOpCanvasDark('ops-opening-out',  opened);
+  // Gradient tree
+  drawOpCanvasDark('ops-grad-orig',    src);
+  drawOpCanvasDark('ops-grad-dilate',  dilated);
+  drawOpCanvasDark('ops-grad-erode',   eroded);
+  drawOpCanvasDark('ops-grad-out',     gradient);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
