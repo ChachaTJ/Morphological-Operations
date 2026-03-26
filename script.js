@@ -46,7 +46,7 @@ function renderKernelDisplay(kernel) {
   const grid = document.getElementById('kernel-grid');
   if (!grid) return;
   const size = kernel.length, rad = Math.floor(size/2);
-  grid.style.gridTemplateColumns = `repeat(${size}, 26px)`;
+  grid.style.gridTemplateColumns = `repeat(${size}, max-content)`;
   grid.innerHTML = '';
   for (let r = 0; r < size; r++) for (let c = 0; c < size; c++) {
     const cell = document.createElement('div');
@@ -383,7 +383,7 @@ function resetCompPanel() {
 function renderBinaryGrid() {
   const con = document.getElementById('binary-grid');
   if (!con) return;
-  con.style.gridTemplateColumns = `repeat(${COLS}, 38px)`;
+  con.style.gridTemplateColumns = `repeat(${COLS}, max-content)`;
   con.innerHTML = '';
   for (let r=0;r<ROWS;r++) for (let c=0;c<COLS;c++) {
     const cell = document.createElement('div');
@@ -444,7 +444,7 @@ function renderMiniKernel(kernel, hitState) {
   if (!grid) return;
   if (!kernel) { grid.innerHTML = '<div style="color:var(--text-muted);font-size:0.75rem;padding:0.5rem;">Run animation…</div>'; return; }
   const size = kernel.length, rad = Math.floor(size/2);
-  grid.style.gridTemplateColumns = `repeat(${size}, 20px)`;
+  grid.style.gridTemplateColumns = `repeat(${size}, max-content)`;
   grid.innerHTML = '';
   for (let r=0; r<size; r++) for (let c=0; c<size; c++) {
     const cell = document.createElement('div');
