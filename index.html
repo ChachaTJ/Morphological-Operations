@@ -197,25 +197,36 @@
 <hr class="divider" /><section id="operations2">
   <span class="section-tag"><span class="mi mi-sm">functions</span> 03 — Operations (3/4)</span>
   <h2 class="section-title">Opening &amp; <span>Closing</span></h2>
-  <p class="section-sub">Two primitives chained for selective clean-up: erode ▶ dilate removes noise; dilate ▶ erode fills holes.</p>
+  <p class="section-sub">Compound operations: two primitives chained together for selective clean-up.</p>
   <div class="op-showcase-full reveal">
-    <!-- Opening row -->
-    <div class="op-oc-row-label">Opening = Erosion → Dilation &nbsp;<span style="font-weight:400;color:var(--text-muted);font-size:0.85rem;">removes small noise while restoring object shape</span></div>
-    <div class="op-canvas-row-big">
-      <div class="op-canvas-block-big"><canvas id="ops-oc-orig"></canvas><div class="op-canvas-lbl">Original</div></div>
-      <div class="op-arrow-big">erode →</div>
-      <div class="op-canvas-block-big"><canvas id="ops-opening-mid"></canvas><div class="op-canvas-lbl">After Erosion</div></div>
-      <div class="op-arrow-big">dilate →</div>
-      <div class="op-canvas-block-big"><canvas id="ops-opening-out"></canvas><div class="op-canvas-lbl" style="color:var(--accent);font-weight:700;">Opening</div></div>
-    </div>
-    <!-- Closing row -->
-    <div class="op-oc-row-label" style="margin-top:1rem;">Closing = Dilation → Erosion &nbsp;<span style="font-weight:400;color:var(--text-muted);font-size:0.85rem;">fills small holes and joins nearby objects</span></div>
-    <div class="op-canvas-row-big">
-      <div class="op-canvas-block-big"><canvas id="ops-oc-orig2"></canvas><div class="op-canvas-lbl">Original</div></div>
-      <div class="op-arrow-big">dilate →</div>
-      <div class="op-canvas-block-big"><canvas id="ops-closing-mid"></canvas><div class="op-canvas-lbl">After Dilation</div></div>
-      <div class="op-arrow-big">erode →</div>
-      <div class="op-canvas-block-big"><canvas id="ops-closing-out"></canvas><div class="op-canvas-lbl" style="color:var(--accent);font-weight:700;">Closing</div></div>
+    <div class="oc-diagram oc-diagram-big">
+      <div class="oc-top">
+        <div class="oc-node"><canvas id="ops-oc-orig"></canvas><div class="op-canvas-lbl">Original</div></div>
+      </div>
+      <div class="oc-mid-arrows">
+        <div class="oc-branch-label left"><span style="color:var(--accent)">dilation ↓</span></div>
+        <div class="oc-branch-label right"><span style="color:var(--accent)">↓ erosion</span></div>
+      </div>
+      <div class="oc-mid">
+        <div class="oc-node"><canvas id="ops-closing-mid"></canvas><div class="op-canvas-lbl">After Dilation</div></div>
+        <div class="oc-node"><canvas id="ops-opening-mid"></canvas><div class="op-canvas-lbl">After Erosion</div></div>
+      </div>
+      <div class="oc-mid-arrows">
+        <div class="oc-branch-label left"><span style="color:var(--accent)">erosion ↓</span></div>
+        <div class="oc-branch-label right"><span style="color:var(--accent)">↓ dilation</span></div>
+      </div>
+      <div class="oc-bot">
+        <div class="oc-node">
+          <canvas id="ops-closing-out"></canvas>
+          <div class="op-canvas-lbl">Closing</div>
+          <div class="oc-formula">= erode(dilate(img)) — fills holes</div>
+        </div>
+        <div class="oc-node">
+          <canvas id="ops-opening-out"></canvas>
+          <div class="op-canvas-lbl">Opening</div>
+          <div class="oc-formula">= dilate(erode(img)) — removes noise</div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -224,16 +235,31 @@
 <hr class="divider" /><section id="operations-gradient">
   <span class="section-tag"><span class="mi mi-sm">functions</span> 03 — Operations (4/4)</span>
   <h2 class="section-title">Morphological <span>Gradient</span></h2>
-  <p class="section-sub">Dilation − Erosion = the structural boundary ring of an object, controlled by kernel radius.</p>
+  <p class="section-sub">Dilation − Erosion = structural boundary of an object, extracted purely by shape.</p>
   <div class="op-showcase-full reveal">
-    <div class="op-canvas-row-big">
-      <div class="op-canvas-block-big"><canvas id="ops-grad-orig"></canvas><div class="op-canvas-lbl">Original</div></div>
-      <div class="op-arrow-big op-math-sign">dilate →</div>
-      <div class="op-canvas-block-big"><canvas id="ops-grad-dilate"></canvas><div class="op-canvas-lbl">After Dilation</div></div>
-      <div class="op-arrow-big op-math-sign">− erode →</div>
-      <div class="op-canvas-block-big"><canvas id="ops-grad-erode"></canvas><div class="op-canvas-lbl">After Erosion</div></div>
-      <div class="op-arrow-big op-math-sign">=</div>
-      <div class="op-canvas-block-big"><canvas id="ops-grad-out"></canvas><div class="op-canvas-lbl" style="color:var(--accent);font-weight:700;">Gradient</div></div>
+    <div class="oc-diagram oc-diagram-big">
+      <div class="oc-top">
+        <div class="oc-node"><canvas id="ops-grad-orig"></canvas><div class="op-canvas-lbl">Original</div></div>
+      </div>
+      <div class="oc-mid-arrows">
+        <div class="oc-branch-label left"><span style="color:var(--accent)">dilation ↓</span></div>
+        <div class="oc-branch-label right"><span style="color:var(--accent)">erosion ↓</span></div>
+      </div>
+      <div class="oc-mid">
+        <div class="oc-node"><canvas id="ops-grad-dilate"></canvas><div class="op-canvas-lbl">After Dilation</div></div>
+        <div class="oc-node"><canvas id="ops-grad-erode"></canvas><div class="op-canvas-lbl">After Erosion</div></div>
+      </div>
+      <div class="oc-mid-arrows" style="justify-content:center; align-items:center; margin-top:0.3rem;">
+        <span style="font-weight:700; color:var(--text); background:var(--bg-card); border:1px solid var(--border); padding:0.2rem 0.8rem; border-radius:4px;">Dilation − Erosion</span>
+      </div>
+      <div style="text-align:center; color:var(--accent); margin-bottom:0.3rem;">↓</div>
+      <div class="oc-bot" style="justify-content:center;">
+        <div class="oc-node">
+          <canvas id="ops-grad-out"></canvas>
+          <div class="op-canvas-lbl" style="font-weight:700; color:var(--text);">Morphological Gradient</div>
+          <div class="oc-formula">= dilate(img) − erode(img)</div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
