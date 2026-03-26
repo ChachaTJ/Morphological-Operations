@@ -841,7 +841,7 @@ function processImageOnCanvas(srcImg,canvasId,op,radius,shape,labelId){
 
 // ── Init ──────────────────────────────────────────────────────
 // ── Op Showcases ──────────────────────────────────────────────
-function drawOpCanvasDark(canvasId, grid) {
+function drawOpCanvasDark(canvasId, grid, bgGrid=null) {
   const canvas = document.getElementById(canvasId);
   if (!canvas || !grid || !grid.length) return;
   const rows = grid.length, cols = grid[0].length;
@@ -866,14 +866,28 @@ function drawOpCanvasDark(canvasId, grid) {
 
   for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
     const v = grid[r][c];
+    const bg = bgGrid ? bgGrid[r][c] : 0;
+    
     if (v) {
       ctx.fillStyle = 'rgba(255,255,255,0.12)';
       ctx.fillRect(c*pw+1, r*ph+1, pw-2, ph-2);
+    } else if (bg) {
+      ctx.fillStyle = 'rgba(255,255,255,0.04)';
+      ctx.fillRect(c*pw+1, r*ph+1, pw-2, ph-2);
     }
-    ctx.fillStyle = v ? '#ffffff' : '#444444';
+    
+    if (v) {
+      ctx.fillStyle = '#ffffff';
+    } else if (bg) {
+      ctx.fillStyle = '#555555';
+    } else {
+      ctx.fillStyle = '#444444';
+    }
+    
+    const textV = v || (bg ? bg : 0);
     ctx.font = `bold ${Math.max(6, pw*0.42)}px "Fira Code",monospace`;
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText(v, c*pw+pw/2, r*ph+ph/2);
+    ctx.fillText(textV, c*pw+pw/2, r*ph+ph/2);
   }
   // subtle grid lines
   ctx.strokeStyle = 'rgba(255,255,255,0.06)'; ctx.lineWidth = 0.5;
@@ -904,21 +918,21 @@ function renderOpShowcases() {
 
   // Erosion
   drawOpCanvasDark('ops-erosion-in',   src);
-  drawOpCanvasDark('ops-erosion-out',  eroded);
+  drawOpCanvasDark('ops-erosion-out',  eroded, src);
   // Dilation
   drawOpCanvasDark('ops-dilation-in',  src);
-  drawOpCanvasDark('ops-dilation-out', dilated);
+  drawOpCanvasDark('ops-dilation-out', dilated, src);
   // Opening & Closing tree
   drawOpCanvasDark('ops-oc-orig',      src);
-  drawOpCanvasDark('ops-closing-mid',  dilated);  // closing path: dilate first
-  drawOpCanvasDark('ops-opening-mid',  eroded);   // opening path: erode first
-  drawOpCanvasDark('ops-closing-out',  closed);
-  drawOpCanvasDark('ops-opening-out',  opened);
+  drawOpCanvasDark('ops-closing-mid',  dilated, src);  // closing path: dilate first
+  drawOpCanvasDark('ops-opening-mid',  eroded, src);   // opening path: erode first
+  drawOpCanvasDark('ops-closing-out',  closed, src);
+  drawOpCanvasDark('ops-opening-out',  opened, src);
   // Gradient tree
   drawOpCanvasDark('ops-grad-orig',    src);
-  drawOpCanvasDark('ops-grad-dilate',  dilated);
-  drawOpCanvasDark('ops-grad-erode',   eroded);
-  drawOpCanvasDark('ops-grad-out',     gradient);
+  drawOpCanvasDark('ops-grad-dilate',  dilated, src);
+  drawOpCanvasDark('ops-grad-erode',   eroded, src);
+  drawOpCanvasDark('ops-grad-out',     gradient, src);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
