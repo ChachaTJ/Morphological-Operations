@@ -240,7 +240,7 @@ hr.divider { border: none; border-top: 1px solid var(--border); }
 .op-canvas-block { flex: 1; min-width: 0; }
 .op-canvas-block canvas {
   border-radius: 10px; width: 100%; display: block;
-  background: #111111;
+  background: #111111; min-height: 120px; max-height: 200px;
 }
 .op-canvas-lbl {
   text-align: center; font-size: 0.7rem; font-weight: 700;
@@ -265,7 +265,7 @@ hr.divider { border: none; border-top: 1px solid var(--border); }
 .oc-top .oc-node { max-width: 320px; }
 .oc-node canvas {
   border-radius: 8px; width: 100%; display: block;
-  background: #111111; min-height: 70px;
+  background: #111111; height: 80px; object-fit: contain;
 }
 .oc-formula {
   text-align: center; font-family: 'Fira Code', monospace; font-size: 0.82rem;

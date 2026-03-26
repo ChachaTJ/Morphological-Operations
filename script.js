@@ -62,14 +62,14 @@ function renderSEVisual() {
   const con = document.getElementById('se-visual');
   if (!con) return;
   const shapes = ['square','cross','disk','diamond'];
-  const labels = ['Square 3×3','Cross (+)','Disk','Diamond'];
+  const labels = ['Square 7×7 (r=3)','Cross r=3','Disk (circle)','Diamond (r=3)'];
   con.innerHTML = '';
   shapes.forEach((shape, i) => {
-    const k = makeKernel(shape, 2), size = k.length, rad = Math.floor(size/2);
+    const k = makeKernel(shape, 3), size = k.length, rad = Math.floor(size/2);
     const wrap = document.createElement('div');
     wrap.className = 'se-shape-wrap';
     const g = document.createElement('div');
-    g.style.cssText = `display:inline-grid;grid-template-columns:repeat(${size},20px);gap:2px;margin-bottom:6px;`;
+    g.style.cssText = `display:inline-grid;grid-template-columns:repeat(${size},16px);gap:2px;margin-bottom:6px;`;
     for (let r = 0; r < size; r++) for (let c = 0; c < size; c++) {
       const cell = document.createElement('div');
       const isC = r===rad && c===rad;
