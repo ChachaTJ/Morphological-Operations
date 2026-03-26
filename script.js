@@ -935,6 +935,43 @@ function renderOpShowcases() {
   drawOpCanvasDark('ops-grad-out',     gradient, src);
 }
 
+// ── Presentation Nav ────────────────────────────────────────────
+let currentSectionIdx = 0;
+function navSlide(dir) {
+  const sections = Array.from(document.querySelectorAll('header, section, footer'));
+  
+  // Find currently most visible section to base our next jump on
+  let closestIdx = 0;
+  let minDiff = Infinity;
+  sections.forEach((sec, idx) => {
+    const rect = sec.getBoundingClientRect();
+    const diff = Math.abs(rect.top);
+    if (diff < minDiff) { minDiff = diff; closestIdx = idx; }
+  });
+  currentSectionIdx = closestIdx + dir;
+  
+  if (currentSectionIdx < 0) currentSectionIdx = 0;
+  if (currentSectionIdx >= sections.length) currentSectionIdx = sections.length - 1;
+  sections[currentSectionIdx].scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+document.addEventListener('keydown', (e) => {
+  if (['ArrowRight','PageDown'].includes(e.key)) { e.preventDefault(); navSlide(1); }
+  if (['ArrowLeft','PageUp'].includes(e.key)) { e.preventDefault(); navSlide(-1); }
+});
+
+document.addEventListener('click', (e) => {
+  if (e.target.closest('.ppt-nav')) return; // handled explicitly
+  const tag = e.target.tagName.toLowerCase();
+  if (['button','a','input','select','canvas','textarea'].includes(tag)) return;
+  if (e.target.closest('.controls-panel') || e.target.closest('.btn-group') || e.target.closest('.lightbox')) return;
+  
+  const clickX = e.clientX;
+  const screenW = window.innerWidth;
+  if (clickX > screenW * 0.85) navSlide(1);
+  else if (clickX < screenW * 0.15) navSlide(-1);
+});
+
 document.addEventListener('DOMContentLoaded', () => {
   renderSEVisual();
   renderFHMGrids();
