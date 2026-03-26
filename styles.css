@@ -257,15 +257,15 @@ hr.divider { border: none; border-top: 1px solid var(--border); }
 .op-bullet-list li { font-size: 1rem; color: var(--text-sub); }
 
 /* Opening & Closing tree diagram */
-.oc-diagram { margin-bottom: 1.5rem; }
-.oc-top  { display: flex; justify-content: center; margin-bottom: 0.4rem; }
-.oc-mid  { display: flex; justify-content: space-between; gap: 1.5rem; margin-bottom: 0.4rem; }
-.oc-bot  { display: flex; justify-content: space-between; gap: 1.5rem; }
+.oc-diagram { margin-bottom: 0.6rem; }
+.oc-top  { display: flex; justify-content: center; margin-bottom: 0.2rem; }
+.oc-mid  { display: flex; justify-content: space-between; gap: 1rem; margin-bottom: 0.2rem; }
+.oc-bot  { display: flex; justify-content: space-between; gap: 1rem; }
 .oc-node { flex: 1; min-width: 100px; }
 .oc-top .oc-node { max-width: 320px; }
 .oc-node canvas {
-  border-radius: 10px; width: 100%; display: block;
-  background: #111111; min-height: 140px;
+  border-radius: 8px; width: 100%; display: block;
+  background: #111111; min-height: 70px;
 }
 .oc-formula {
   text-align: center; font-family: 'Fira Code', monospace; font-size: 0.82rem;
@@ -292,10 +292,10 @@ hr.divider { border: none; border-top: 1px solid var(--border); }
 /* ---------- INTERACTIVE DEMO ---------- */
 #demo-section {
   background: var(--bg-card);
-  border-radius: 16px; padding: 2rem;
+  border-radius: 16px; padding: 1rem;
   border: 1px solid var(--border);
 }
-.demo-layout { display: grid; grid-template-columns: 280px 1fr; gap: 2rem; align-items: start; }
+.demo-layout { display: grid; grid-template-columns: 220px 1fr; gap: 1.2rem; align-items: start; }
 @media (max-width: 900px) { .demo-layout { grid-template-columns: 1fr; } }
 
 .controls-panel {
