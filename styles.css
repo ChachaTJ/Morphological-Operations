@@ -234,9 +234,29 @@ hr.divider { border: none; border-top: 1px solid var(--border); }
   font-size: clamp(1.4rem, 3vw, 2rem); font-weight: 900;
   letter-spacing: -0.04em; color: var(--text); margin-bottom: 0.8rem;
 }
+/* Full-screen single-operation layout */
+.op-showcase-full {
+  flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 1.5rem;
+}
+.op-canvas-row-big {
+  display: flex; align-items: center; gap: 3rem;
+}
+.op-canvas-block-big { flex: 1; min-width: 0; }
+.op-canvas-block-big canvas {
+  border-radius: 14px; width: 100%; display: block;
+  background: #111111; min-height: 280px;
+}
+.op-bullet-big { font-size: 1.1rem; gap: 0.6rem; margin-top: 0.5rem; }
+.op-bullet-big li { font-size: 1.05rem; }
+
+/* Larger oc-diagram for standalone slides */
+.oc-diagram-big .oc-node canvas { height: 140px !important; }
+.oc-diagram-big .oc-top .oc-node { width: 180px; max-width: 180px; }
+
 .op-canvas-row {
   display: flex; align-items: center; gap: 2rem; margin-bottom: 1.5rem;
 }
+
 .op-canvas-block { flex: 1; min-width: 0; }
 .op-canvas-block canvas {
   border-radius: 10px; width: 100%; display: block;
