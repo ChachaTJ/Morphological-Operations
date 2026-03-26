@@ -252,7 +252,7 @@ function showOp(name, btn) {
 }
 
 // ── Binary grid ───────────────────────────────────────────────
-const ROWS = 12, COLS = 18;
+const ROWS = 16, COLS = 16;
 let binaryGrid = [];
 let animFrame = null, isAnimating = false;
 let isDragging = false, dragValue = null;
@@ -362,7 +362,26 @@ function clearGrid() {
 function resetGrid() { loadPreset('letter-A'); }
 function loadPreset(name) {
   const p = PRESETS[name];
-  binaryGrid = p.map(r=>[...r]);
+  const pRows = p.length;
+  const pCols = pRows > 0 ? p[0].length : 0;
+  binaryGrid = [];
+  
+  const rOffset = Math.floor((ROWS - pRows) / 2);
+  const cOffset = Math.floor((COLS - pCols) / 2);
+
+  for (let r = 0; r < ROWS; r++) {
+    const row = [];
+    for (let c = 0; c < COLS; c++) {
+      const pr = r - rOffset;
+      const pc = c - cOffset;
+      if (pr >= 0 && pr < pRows && pc >= 0 && pc < pCols && p[pr][pc] !== undefined) {
+        row.push(p[pr][pc]);
+      } else {
+        row.push(0);
+      }
+    }
+    binaryGrid.push(row);
+  }
   renderBinaryGrid(); clearOutputCanvases(); resetCompPanel();
 }
 function clearOutputCanvases() {
