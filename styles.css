@@ -258,7 +258,7 @@ hr.divider { border: none; border-top: 1px solid var(--border); }
 .oc-top  { display: flex; justify-content: center; margin-bottom: 0.4rem; }
 .oc-mid  { display: flex; justify-content: space-between; gap: 1.5rem; margin-bottom: 0.4rem; }
 .oc-bot  { display: flex; justify-content: space-between; gap: 1.5rem; }
-.oc-node { flex: 1; min-width: 0; }
+.oc-node { flex: 1; min-width: 100px; }
 .oc-top .oc-node { max-width: 320px; }
 .oc-node canvas {
   border-radius: 10px; width: 100%; display: block;

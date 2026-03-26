@@ -869,19 +869,19 @@ function drawOpCanvasDark(canvasId, grid, bgGrid=null) {
     const bg = bgGrid ? bgGrid[r][c] : 0;
     
     if (v) {
-      ctx.fillStyle = 'rgba(255,255,255,0.12)';
+      ctx.fillStyle = 'rgba(255,255,255,0.15)'; // Bright box for foreground
       ctx.fillRect(c*pw+1, r*ph+1, pw-2, ph-2);
     } else if (bg) {
-      ctx.fillStyle = 'rgba(255,255,255,0.04)';
+      ctx.fillStyle = 'rgba(255,255,255,0.08)'; // Noticeable faint box for background
       ctx.fillRect(c*pw+1, r*ph+1, pw-2, ph-2);
     }
     
     if (v) {
-      ctx.fillStyle = '#ffffff';
+      ctx.fillStyle = '#ffffff'; // Bright text
     } else if (bg) {
-      ctx.fillStyle = '#555555';
+      ctx.fillStyle = '#9e9e9e'; // Distinct grey text for original
     } else {
-      ctx.fillStyle = '#444444';
+      ctx.fillStyle = '#333333'; // Very dark text for empty space
     }
     
     const textV = v || (bg ? bg : 0);
