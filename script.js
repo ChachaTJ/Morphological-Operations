@@ -544,7 +544,6 @@ function drawGridOnCanvas(canvasId, grid, hrC, hrR, kernel, diffBase) {
   const canvas=document.getElementById(canvasId); if(!canvas) return;
   const rows=grid.length, cols=grid[0].length;
 
-  // Match canvas resolution to actual display size × devicePixelRatio → sharp text
   const dpr=window.devicePixelRatio||1;
   const rect=canvas.getBoundingClientRect();
   const dispW=rect.width||canvas.offsetWidth||400;
@@ -554,7 +553,11 @@ function drawGridOnCanvas(canvasId, grid, hrC, hrR, kernel, diffBase) {
   const ctx=canvas.getContext('2d');
   ctx.scale(dpr,dpr);
   const pw=dispW/cols, ph=dispH/rows;
-  ctx.clearRect(0,0,dispW,dispH);
+
+  // Dark background
+  ctx.fillStyle='#111111';
+  ctx.fillRect(0,0,dispW,dispH);
+
   const kR=kernel?Math.floor(kernel.length/2):0;
 
   for(let r=0;r<rows;r++) for(let c=0;c<cols;c++){
@@ -562,26 +565,36 @@ function drawGridOnCanvas(canvasId, grid, hrC, hrR, kernel, diffBase) {
     const inK=kernel&&hrC!==undefined&&Math.abs(r-hrR)<=kR&&Math.abs(c-hrC)<=kR&&kernel[r-hrR+kR]&&kernel[r-hrR+kR][c-hrC+kR];
     if(diffBase){
       const o=diffBase[r][c];
-      ctx.fillStyle=v===o?(v?'#fde8e8':'#f5f5f5'):(v>o?'rgba(0,137,123,0.3)':'rgba(192,57,43,0.2)');
+      if(v===o){
+        ctx.fillStyle = v ? 'rgba(192,57,43,0.18)' : 'transparent';
+      } else {
+        ctx.fillStyle = v>o ? 'rgba(0,180,120,0.35)' : 'rgba(192,57,43,0.25)';
+      }
     } else if(inK){
-      ctx.fillStyle=v?'rgba(192,57,43,0.18)':'rgba(0,0,0,0.04)';
+      ctx.fillStyle = v ? 'rgba(192,57,43,0.35)' : 'rgba(255,255,255,0.04)';
     } else {
-      ctx.fillStyle=v?'#fde8e8':'#f5f5f5';
+      ctx.fillStyle = v ? 'rgba(192,57,43,0.2)' : 'transparent';
     }
-    ctx.fillRect(c*pw,r*ph,pw,ph);
-    ctx.fillStyle=v?(inK?'#c0392b':'#c0392b'):'#d0d0d0';
+    if(ctx.fillStyle!=='transparent') ctx.fillRect(c*pw,r*ph,pw,ph);
+
+    if(diffBase){
+      const o=diffBase[r][c];
+      ctx.fillStyle = v===o ? (v?'#e85858':'#444444') : (v>o?'#43d9ad':'#e74c3c');
+    } else {
+      ctx.fillStyle = v ? (inK?'#ff6b6b':'#e85858') : '#404040';
+    }
     ctx.font=`bold ${Math.max(7,pw*0.38)}px "Fira Code",monospace`;
     ctx.textAlign='center'; ctx.textBaseline='middle';
     ctx.fillText(v,c*pw+pw/2,r*ph+ph/2);
   }
   if(kernel&&hrC!==undefined){
     const kS=kernel.length, sR=hrR-kR, sC=hrC-kR;
-    ctx.strokeStyle='#c0392b'; ctx.lineWidth=2.5;
+    ctx.strokeStyle='rgba(220,50,50,0.9)'; ctx.lineWidth=2.5;
     ctx.strokeRect(sC*pw,sR*ph,kS*pw,kS*ph);
-    ctx.strokeStyle='rgba(0,137,123,0.8)'; ctx.lineWidth=1.5;
+    ctx.strokeStyle='rgba(0,220,150,0.9)'; ctx.lineWidth=1.5;
     ctx.strokeRect(hrC*pw+2,hrR*ph+2,pw-4,ph-4);
   }
-  ctx.strokeStyle='rgba(0,0,0,0.06)'; ctx.lineWidth=0.5;
+  ctx.strokeStyle='rgba(255,255,255,0.07)'; ctx.lineWidth=0.5;
   for(let r=0;r<=rows;r++){ctx.beginPath();ctx.moveTo(0,r*ph);ctx.lineTo(dispW,r*ph);ctx.stroke();}
   for(let c=0;c<=cols;c++){ctx.beginPath();ctx.moveTo(c*pw,0);ctx.lineTo(c*pw,dispH);ctx.stroke();}
 }
@@ -928,11 +941,13 @@ function renderOpShowcases() {
   drawOpCanvasDark('ops-opening-mid',  eroded, src);   // opening path: erode first
   drawOpCanvasDark('ops-closing-out',  closed, src);
   drawOpCanvasDark('ops-opening-out',  opened, src);
-  // Gradient tree
+  // Gradient
   drawOpCanvasDark('ops-grad-orig',    src);
   drawOpCanvasDark('ops-grad-dilate',  dilated, src);
   drawOpCanvasDark('ops-grad-erode',   eroded, src);
   drawOpCanvasDark('ops-grad-out',     gradient, src);
+  // Extra original for closing row
+  drawOpCanvasDark('ops-oc-orig2',     src);
 }
 
 // ── Presentation Nav ────────────────────────────────────────────

@@ -276,6 +276,15 @@ hr.divider { border: none; border-top: 1px solid var(--border); }
 }
 .op-bullet-list li { font-size: 1rem; color: var(--text-sub); }
 
+/* Row label for Opening/Closing two-row layout */
+.op-oc-row-label { font-size: 0.9rem; font-weight: 700; color: var(--text); margin-bottom: 0.4rem; }
+.op-math-sign { font-size: 1.2rem; letter-spacing: -0.02em; flex-shrink: 0; font-weight: 700; }
+
+/* Make Live Demo canvases dark to match op canvases */
+#canvas-input, #canvas-output, #canvas-diff {
+  background: #111111 !important; border-radius: 10px;
+}
+
 /* Opening & Closing tree diagram */
 .oc-diagram { margin-bottom: 0.6rem; }
 .oc-top  { display: flex; justify-content: center; margin-bottom: 0.2rem; }
