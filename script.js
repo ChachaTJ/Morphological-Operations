@@ -773,7 +773,7 @@ function renderExample(idx) {
   const labelEl = document.getElementById(`ex${idx}-label`);
   if (labelEl) labelEl.textContent = `${op} (r=${r}, ${shape})`;
 
-  const srcs = {1:'images/Morphorlogical Operations.png', 2:'images/Gausian Blur.png', 3:'images/TIme Squre.png'};
+  const srcs = {1:'images/Morphorlogical Operations.png', 2:'images/Gausian Blur.png', 3:'images/imageexample.png'};
   const src = srcs[idx];
   const img = new Image();
   img.onload = () => processImageOnCanvas(img, `ex${idx}-canvas`, op, r, shape, `ex${idx}-label`);

@@ -426,6 +426,7 @@
         <button class="btn-toggle" onclick="setGlobalOp('dilation', this)">Dilation</button>
         <button class="btn-toggle active" onclick="setGlobalOp('opening', this)">Opening</button>
         <button class="btn-toggle" onclick="setGlobalOp('closing', this)">Closing</button>
+        <button class="btn-toggle" onclick="setGlobalOp('gradient', this)">Gradient</button>
       </div>
     </div>
 
@@ -495,17 +496,17 @@
       </div>
     </div>
 
-    <!-- Example 3: Times Square -->
+    <!-- Example 3: Gradient Example -->
     <div class="example-card">
       <div class="ex-header">
-        <h4><span class="mi mi-sm">location_city</span> Times Square — Edge Extraction</h4>
-        <p>Morphological operations clean up sign contours</p>
+        <h4><span class="mi mi-sm">layers</span> Object Boundary — Morphological Gradient</h4>
+        <p>Difference between dilation and erosion to determine the outline of an object.</p>
       </div>
       <div class="ex-body">
 
         <div class="ex-images">
           <div class="ex-img-wrap">
-            <img src="images/TIme Squre.png" alt="Times Square" class="zoomable" onclick="openLightbox(this)" />
+            <img src="images/imageexample.png" alt="Morphological Gradient Input" class="zoomable" onclick="openLightbox(this)" />
             <div class="ex-img-label">Original</div>
           </div>
           <div class="ex-arrow">→</div>
