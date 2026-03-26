@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Morphological Operations – Vision AI Workshop 6</title>
+  <meta name="description" content="Interactive visual presentation of Morphological Image Processing: Erosion, Dilation, Opening, Closing, and more — with pixel-level animation." />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" />
+</head>
+<body>
+
+<!-- Scroll progress bar -->
+<div class="scroll-indicator" id="scroll-bar"></div>
+
+<!-- Navigation -->
+<nav id="main-nav">
+  <span class="logo">Morphological <span>Ops</span></span>
+  <ul>
+    <li><a href="#hero"        id="nav-hero">Intro</a></li>
+    <li><a href="#motivation"  id="nav-motivation">Motivation</a></li>
+    <li><a href="#definitions" id="nav-definitions">Definitions</a></li>
+    <li><a href="#operations"  id="nav-operations">Operations</a></li>
+    <li><a href="#interactive" id="nav-interactive">Live Demo</a></li>
+    <li><a href="#examples"    id="nav-examples">Examples</a></li>
+    <li><a href="#parameters"  id="nav-parameters">Parameters</a></li>
+    <li><a href="#takeaways"   id="nav-takeaways">Takeaways</a></li>
+  </ul>
+</nav>
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<section id="hero">
+  <h1>Morphological<br><em>Operations</em></h1>
+  <p class="lead">
+    Shape-based image transformations that analyze and process binary images using
+    a <strong>structuring element</strong> — probing every pixel for geometric fit.
+  </p>
+  <div class="hero-chips">
+    <span class="chip active-chip">Erosion</span>
+    <span class="chip active-chip">Dilation</span>
+    <span class="chip">Opening</span>
+    <span class="chip">Closing</span>
+  </div>
+
+  <div class="hero-image fade-in" style="animation-delay: 0.2s; margin-top:2.5rem;">
+    <img src="images/intro_edge.png" alt="Boundary Extraction Example" style="max-width: 100%; border-radius: 12px; box-shadow: 0 15px 40px rgba(0,0,0,0.1);" />
+  </div>
+</section>
+
+<!-- ═══════════════ 01 MOTIVATION ═══════════════ -->
+<hr class="divider" /><section id="motivation" class="reveal">
+  <span class="section-tag">01 — Motivation</span>
+  <h2 class="section-title">Why do we need <span>morphology</span>?</h2>
+  <p class="section-sub">
+    Real-world images are messy. Binary masks from thresholding have holes, noise speckles,
+    and broken edges. Morphological operations fix this using nothing more than a geometric probe.
+  </p>
+
+  <div class="card-grid cols3" style="margin-bottom:2rem;">
+    <div class="card reveal">
+      <div class="icon"><span class="mi mi-lg" style="color:var(--accent)">science</span></div>
+      <h3>Noise Removal</h3>
+      <p>Salt-and-pepper noise (isolated white pixels) is erased by erosion or opening — without a convolution kernel.</p>
+    </div>
+    <div class="card reveal">
+      <div class="icon"><span class="mi mi-lg" style="color:var(--accent)">location_city</span></div>
+      <h3>Shape Analysis</h3>
+      <p>Extract boundaries, fill holes, count connected regions, and separate touching objects — all fundamental to segmentation.</p>
+    </div>
+    <div class="card reveal">
+      <div class="icon"><span class="mi mi-lg" style="color:var(--accent)">grid_view</span></div>
+      <h3>Pre/Post-Processing</h3>
+      <p>Morphology cleans up thresholded images before OCR, edge detection, and object recognition — making downstream steps robust.</p>
+    </div>
+  </div>
+
+  <div class="motivation-grid reveal">
+    <div class="motivation-img-card">
+      <img src="images/TIme Squre.png" alt="Times Square" />
+      <div class="img-caption">
+        <h4><span class="mi mi-sm">location_city</span> Times Square Scene</h4>
+        <p>After thresholding, text regions and sign boundaries fragment. Morphological gradient recovers clean contours for billboard detection.</p>
+      </div>
+    </div>
+    <div class="motivation-img-card">
+      <img src="images/Morphorlogical Operations.png" alt="Julia test patterns" />
+      <div class="img-caption">
+        <h4><span class="mi mi-sm">grid_on</span> Classic Test Patterns (Julia)</h4>
+        <p>Hexagons, digits, circles, and stripes — each structure tests a different morphological behaviour. Used throughout this demo.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ 02 DEFINITIONS ═══════════════ -->
+<hr class="divider" /><section id="definitions" class="reveal">
+  <span class="section-tag">02 — Method Definitions</span>
+  <h2 class="section-title">Key <span>terminology</span></h2>
+  <p class="section-sub">
+    Every morphological operation is built from two concepts:
+    a <strong>Structuring Element</strong> (SE) and a <strong>comparison rule</strong> — FIT, HIT, or MISS.
+  </p>
+
+  <!-- SE shapes -->
+  <div class="card" style="margin-bottom:1.5rem;">
+    <h3><span class="mi mi-sm">grid_on</span> Structuring Element (SE / Kernel)</h3>
+    <p style="margin-top:0.4rem; color:var(--text-muted); font-size:0.9rem;">
+      A small binary matrix centered on each image pixel. Its shape and size define the <em>neighbourhood probe</em>.
+      The center cell (⊕) is the anchor. Common shapes below (radius = 2):
+    </p>
+    <div class="se-shapes-row" id="se-visual"><!-- filled by JS --></div>
+  </div>
+
+  <!-- Fit / Hit / Miss -->
+  <div class="fhm-row">
+    <div class="fhm-card fit reveal">
+      <span class="fhm-label">FIT</span>
+      <h4><span class="mi" style="color:var(--green);font-size:1.2rem;">check_circle</span> Full Overlap</h4>
+      <div class="fhm-grid-wrap" id="fhm-fit"><!-- JS --></div>
+      <p><strong>All</strong> foreground SE cells overlap with foreground image pixels.<br>
+         → Erosion outputs <strong>1</strong> here.</p>
+    </div>
+    <div class="fhm-card hit reveal">
+      <span class="fhm-label">HIT</span>
+      <h4><span class="mi" style="color:var(--accent);font-size:1.2rem;">bolt</span> Partial Overlap</h4>
+      <div class="fhm-grid-wrap" id="fhm-hit"><!-- JS --></div>
+      <p><strong>At least one</strong> SE foreground cell overlaps a foreground pixel.<br>
+         → Dilation outputs <strong>1</strong> here.</p>
+    </div>
+    <div class="fhm-card miss reveal">
+      <span class="fhm-label">MISS</span>
+      <h4><span class="mi" style="color:var(--red);font-size:1.2rem;">cancel</span> No Overlap</h4>
+      <div class="fhm-grid-wrap" id="fhm-miss"><!-- JS --></div>
+      <p><strong>Zero</strong> SE foreground cells overlap any foreground pixel.<br>
+         → Both Erosion and Dilation output <strong>0</strong>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ 03 OPERATIONS ═══════════════ -->
+<hr class="divider" /><section id="operations">
+  <span class="section-tag"><span class="mi mi-sm">functions</span> 03 — Operations</span>
+  <h2 class="section-title">The four <span>core operations</span></h2>
+  <p class="section-sub">Each operation sweeps a structuring element over every pixel and applies a simple geometric rule.</p>
+
+  <!-- EROSION -->
+  <div class="op-showcase reveal">
+    <div class="op-showcase-title">Erosion</div>
+    <div class="op-canvas-row">
+      <div class="op-canvas-block">
+        <canvas id="ops-erosion-in"></canvas>
+        <div class="op-canvas-lbl">Input (Binary)</div>
+      </div>
+      <div class="op-arrow-big">→</div>
+      <div class="op-canvas-block">
+        <canvas id="ops-erosion-out"></canvas>
+        <div class="op-canvas-lbl">After Erosion</div>
+      </div>
+    </div>
+    <ul class="op-bullet-list">
+      <li>Shrinks foreground objects</li>
+      <li>Removes small bright noise</li>
+      <li>Breaks thin connections</li>
+      <li>Makes boundaries move inward</li>
+    </ul>
+  </div>
+
+  <!-- DILATION -->
+  <div class="op-showcase reveal">
+    <div class="op-showcase-title">Dilation</div>
+    <div class="op-canvas-row">
+      <div class="op-canvas-block">
+        <canvas id="ops-dilation-in"></canvas>
+        <div class="op-canvas-lbl">Input (Binary)</div>
+      </div>
+      <div class="op-arrow-big">→</div>
+      <div class="op-canvas-block">
+        <canvas id="ops-dilation-out"></canvas>
+        <div class="op-canvas-lbl">After Dilation</div>
+      </div>
+    </div>
+    <ul class="op-bullet-list">
+      <li>Expands foreground objects</li>
+      <li>Thickens shapes</li>
+      <li>Connects nearby components</li>
+      <li>Makes boundaries move outward</li>
+    </ul>
+  </div>
+
+  <!-- OPENING & CLOSING -->
+  <div class="op-showcase reveal">
+    <div class="op-showcase-title">Opening &amp; Closing</div>
+    <div class="oc-diagram">
+      <!-- Top: original -->
+      <div class="oc-top">
+        <div class="oc-node">
+          <canvas id="ops-oc-orig"></canvas>
+          <div class="op-canvas-lbl">Original</div>
+        </div>
+      </div>
+      <!-- Mid arrows -->
+      <div class="oc-mid-arrows">
+        <div class="oc-branch-label left"><span style="color:var(--accent)">dilation ↓</span></div>
+        <div class="oc-branch-label right"><span style="color:var(--accent)">↓ erosion</span></div>
+      </div>
+      <!-- Mid: intermediates -->
+      <div class="oc-mid">
+        <div class="oc-node">
+          <canvas id="ops-closing-mid"></canvas>
+          <div class="op-canvas-lbl">After Dilation</div>
+        </div>
+        <div class="oc-node">
+          <canvas id="ops-opening-mid"></canvas>
+          <div class="op-canvas-lbl">After Erosion</div>
+        </div>
+      </div>
+      <!-- Bot arrows -->
+      <div class="oc-mid-arrows">
+        <div class="oc-branch-label left"><span style="color:var(--accent)">erosion ↓</span></div>
+        <div class="oc-branch-label right"><span style="color:var(--accent)">↓ dilation</span></div>
+      </div>
+      <!-- Bot: results -->
+      <div class="oc-bot">
+        <div class="oc-node">
+          <canvas id="ops-closing-out"></canvas>
+          <div class="op-canvas-lbl">Closing</div>
+          <div class="oc-formula">= erode(dilate(img))</div>
+        </div>
+        <div class="oc-node">
+          <canvas id="ops-opening-out"></canvas>
+          <div class="op-canvas-lbl">Opening</div>
+          <div class="oc-formula">= dilate(erode(img))</div>
+        </div>
+      </div>
+    </div>
+    <div class="oc-bullets-row">
+      <div class="oc-bullet-block">
+        <strong>Closing</strong> = Dilation → Erosion
+        <ul class="op-bullet-list" style="margin-top:0.4rem;">
+          <li>Fills small holes and gaps</li>
+          <li>Joins nearby objects</li>
+        </ul>
+      </div>
+      <div class="oc-bullet-block">
+        <strong>Opening</strong> = Erosion → Dilation
+        <ul class="op-bullet-list" style="margin-top:0.4rem;">
+          <li>Removes small noise</li>
+          <li>Restores shape of larger objects</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════ 04 LIVE DEMO ═══════════════ -->
+<hr class="divider" /><section id="interactive">
+  <span class="section-tag">04 — Live Interactive Demo</span>
+  <h2 class="section-title"><em>Step-by-step</em> pixel visualization</h2>
+  <p class="section-sub">
+    Draw on the binary grid, pick an operation and kernel, then watch the SE sweep pixel by pixel.
+    The <span style="color:var(--red);font-weight:700;">red outline</span> shows the kernel coverage;
+    <span style="color:var(--accent3);font-weight:700;">teal = center pixel</span>;
+    <span style="color:#43d9ad;font-weight:700;">green = HIT</span>;
+    <span style="color:var(--red);font-weight:700;">red = MISS</span>.
+  </p>
+
+  <div id="demo-section">
+    <div class="demo-layout">
+
+      <!-- CONTROLS -->
+      <div class="controls-panel">
+        <div class="controls-panel-title">⚙️ Controls</div>
+
+        <div class="control-group">
+          <label>Operation <span class="ctrl-val" id="op-val">Dilation</span></label>
+          <select id="ctrl-op">
+            <option value="dilation">Dilation</option>
+            <option value="erosion">Erosion</option>
+            <option value="opening">Opening</option>
+            <option value="closing">Closing</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label>Kernel Shape <span class="ctrl-val" id="ks-val">Square</span></label>
+          <select id="ctrl-kshape">
+            <option value="square">Square</option>
+            <option value="cross">Cross (+)</option>
+            <option value="disk">Disk</option>
+            <option value="diamond">Diamond</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label>Kernel Radius <span class="ctrl-val" id="kr-val">1</span></label>
+          <input type="range" id="ctrl-radius" min="1" max="3" value="1" />
+        </div>
+
+        <div class="control-group">
+          <label>Iterations <span class="ctrl-val" id="it-val">1</span></label>
+          <input type="range" id="ctrl-iter" min="1" max="5" value="1" />
+        </div>
+
+        <div class="control-group">
+          <label>Anim Speed <span class="ctrl-val" id="sp-val">Medium</span></label>
+          <input type="range" id="ctrl-speed" min="1" max="5" value="3" />
+        </div>
+
+        <div class="control-group">
+          <label>Polarity <span class="ctrl-val" id="po-val">White=FG</span></label>
+          <select id="ctrl-polarity">
+            <option value="white">White = Foreground</option>
+            <option value="black">Black = Foreground</option>
+          </select>
+        </div>
+
+        <!-- Kernel preview -->
+        <div class="kernel-display">
+          <div class="kernel-label">Current Kernel</div>
+          <div id="kernel-grid"></div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-primary"   onclick="applyOperation()" id="btn-apply"><span class="mi mi-sm">play_arrow</span> Apply</button>
+          <button class="btn-danger"    onclick="toggleAnimate()"  id="btn-anim"><span class="mi mi-sm">animation</span> Animate</button>
+          <button class="btn-secondary" onclick="resetGrid()"       id="btn-reset"><span class="mi mi-sm">refresh</span> Reset</button>
+        </div>
+
+        <div class="step-info" id="step-info">
+          Click <b>▶ Apply</b> for instant result, or <span class="hl-r">⚡ Animate</span> to watch the kernel sweep step by step.
+        </div>
+      </div>
+
+      <!-- CANVAS AREA -->
+      <div class="canvas-area">
+
+        <!-- Input grid -->
+        <div class="card" style="padding:1rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem; flex-wrap:wrap; gap:0.4rem;">
+            <span style="font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted);">
+              Input Grid <span style="color:var(--accent3);">(click/drag to toggle)</span>
+            </span>
+            <div class="preset-row">
+              <button class="preset-btn" onclick="loadPreset('letter-A')">Letter A</button>
+              <button class="preset-btn" onclick="loadPreset('circle')">Circle</button>
+              <button class="preset-btn" onclick="loadPreset('noise')">Noisy</button>
+              <button class="preset-btn" onclick="loadPreset('thick')">Thick L</button>
+              <button class="preset-btn" onclick="clearGrid()"><span class="mi mi-sm">clear</span></button>
+            </div>
+          </div>
+          <div id="binary-grid-container">
+            <div id="binary-grid"></div>
+          </div>
+        </div>
+
+        <!-- Computation Panel -->
+        <div id="comp-panel">
+          <div class="comp-header"><span class="mi mi-sm">biotech</span> Computation View — live kernel match</div>
+          <div class="comp-body">
+            <div class="comp-mini-kernel">
+              <div class="mini-label">Kernel State</div>
+              <div id="mini-kernel-grid"></div>
+            </div>
+            <div class="comp-info">
+              <div class="comp-pixel-pos" id="comp-pos">Pixel [–, –]</div>
+              <div class="comp-stats">
+                <div class="comp-stat">
+                  <span class="stat-label">Overlap:</span>
+                  <span class="stat-val" id="comp-overlap">–/–</span>
+                </div>
+                <div class="comp-stat">
+                  <span class="stat-label">Status:</span>
+                  <span class="stat-val" id="comp-status">–</span>
+                </div>
+                <div class="comp-stat">
+                  <span class="stat-label">Rule:</span>
+                  <span class="stat-val" style="color:var(--text-muted);" id="comp-rule">–</span>
+                </div>
+              </div>
+              <div id="comp-output"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Output canvases -->
+        <div class="canvas-row">
+          <div class="canvas-wrapper">
+            <div class="canvas-label">Input (binary)</div>
+            <canvas id="canvas-input" width="250" height="200"></canvas>
+          </div>
+          <div class="canvas-arrow">→</div>
+          <div class="canvas-wrapper">
+            <div class="canvas-label" id="canvas-out-label"><span class="mi mi-sm">output</span> Output (result)</div>
+            <canvas id="canvas-output" width="250" height="200"></canvas>
+          </div>
+        </div>
+        <div class="canvas-row">
+          <div class="canvas-wrapper" style="flex:1;">
+            <div class="canvas-label"><span class="mi mi-sm">difference</span> Diff — <span style="color:var(--green);">green=added</span> / <span style="color:var(--red);">red=removed</span></div>
+            <canvas id="canvas-diff" width="250" height="200"></canvas>
+          </div>
+        </div>
+
+        <!-- Code snippet -->
+        <div>
+          <div style="font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); margin-bottom:0.5rem;">📝 Equivalent Python / OpenCV</div>
+          <div class="code-block" id="code-display"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ 05 EXAMPLES ═══════════════ -->
+<hr class="divider" /><section id="examples" class="reveal">
+  <span class="section-tag">05 — Examples of Method</span>
+  <h2 class="section-title">Before <span>&</span> <em>after</em></h2>
+
+  <div class="ex-controls" style="margin-top:1.5rem; justify-content:center; background:var(--bg-card); padding:1rem; border-radius:10px; border:1px solid var(--border); display:flex; flex-wrap:wrap; gap:1rem; align-items:center;">
+    
+    <div style="display:flex; align-items:center; gap:0.5rem;">
+      <label>Operation:</label>
+      <div class="btn-group" id="global-ex-ops" style="display:flex;">
+        <button class="btn-toggle" onclick="setGlobalOp('erosion', this)">Erosion</button>
+        <button class="btn-toggle" onclick="setGlobalOp('dilation', this)">Dilation</button>
+        <button class="btn-toggle active" onclick="setGlobalOp('opening', this)">Opening</button>
+        <button class="btn-toggle" onclick="setGlobalOp('closing', this)">Closing</button>
+      </div>
+    </div>
+
+    <div style="display:flex; align-items:center; gap:0.5rem;">
+      <label>Kernel:</label>
+      <div class="btn-group" id="global-ex-shape-ops" style="display:flex;">
+        <button class="btn-toggle active" onclick="setGlobalShape('square', this)"><span class="mi mi-sm">square</span> Square</button>
+        <button class="btn-toggle" onclick="setGlobalShape('circle', this)"><span class="mi mi-sm">circle</span> Circle</button>
+        <button class="btn-toggle" onclick="setGlobalShape('cross', this)"><span class="mi mi-sm">add</span> Cross</button>
+      </div>
+    </div>
+
+    <div style="display:flex; align-items:center; gap:0.5rem;">
+      <label>Radius (r):</label>
+      <div class="btn-group" id="global-ex-r-ops" style="display:flex;">
+        <button class="btn-toggle" onclick="setGlobalR(1, this)">1</button>
+        <button class="btn-toggle" onclick="setGlobalR(2, this)">2</button>
+        <button class="btn-toggle active" onclick="setGlobalR(3, this)">3</button>
+        <button class="btn-toggle" onclick="setGlobalR(4, this)">4</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="example-grid">
+
+    <!-- Example 1: Julia patterns -->
+    <div class="example-card">
+      <div class="ex-header">
+        <h4><span class="mi mi-sm">grid_on</span> Binary Test Patterns</h4>
+        <p>Structuring elements on hexagons, digits, circles</p>
+      </div>
+      <div class="ex-body">
+
+        <div class="ex-images">
+          <div class="ex-img-wrap">
+            <img src="images/Morphorlogical Operations.png" alt="Original" class="zoomable" onclick="openLightbox(this)" />
+            <div class="ex-img-label">Original</div>
+          </div>
+          <div class="ex-arrow">→</div>
+          <div class="ex-img-wrap">
+            <canvas id="ex1-canvas" width="512" height="512" class="zoomable" onclick="openLightbox(this)"></canvas>
+            <div class="ex-img-label" id="ex1-label">Result</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Example 2: Noisy image -->
+    <div class="example-card">
+      <div class="ex-header">
+        <h4><span class="mi mi-sm">photo_camera</span> Noisy Image (Gaussian Blur)</h4>
+        <p>Salt &amp; pepper noise removal via opening</p>
+      </div>
+      <div class="ex-body">
+
+        <div class="ex-images">
+          <div class="ex-img-wrap">
+            <img src="images/Gausian Blur.png" alt="Noisy" class="zoomable" onclick="openLightbox(this)" />
+            <div class="ex-img-label">Original (noisy)</div>
+          </div>
+          <div class="ex-arrow">→</div>
+          <div class="ex-img-wrap">
+            <canvas id="ex2-canvas" width="512" height="512" class="zoomable" onclick="openLightbox(this)"></canvas>
+            <div class="ex-img-label" id="ex2-label">Result</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Example 3: Times Square -->
+    <div class="example-card">
+      <div class="ex-header">
+        <h4><span class="mi mi-sm">location_city</span> Times Square — Edge Extraction</h4>
+        <p>Morphological gradient highlights sign contours</p>
+      </div>
+      <div class="ex-body">
+
+        <div class="ex-images">
+          <div class="ex-img-wrap">
+            <img src="images/TIme Squre.png" alt="Times Square" class="zoomable" onclick="openLightbox(this)" />
+            <div class="ex-img-label">Original</div>
+          </div>
+          <div class="ex-arrow">→</div>
+          <div class="ex-img-wrap">
+            <canvas id="ex3-canvas" width="512" height="512" class="zoomable" onclick="openLightbox(this)"></canvas>
+            <div class="ex-img-label" id="ex3-label">Result</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Where it works / struggles -->
+  <div class="works-grid" style="margin-top:1.8rem;">
+    <div class="works-card good">
+      <h4><span class="mi mi-sm" style="color:var(--green)">check_circle</span> Where it works well</h4>
+      <ul>
+        <li>Binary images with clear foreground/background separation</li>
+        <li>Removing small noise blobs (opening)</li>
+        <li>Filling small interior holes (closing)</li>
+        <li>Extracting object boundaries (gradient = dilate − erode)</li>
+        <li>Separating closely touching connected objects</li>
+        <li>Illumination correction (Top Hat on uneven background)</li>
+      </ul>
+    </div>
+    <div class="works-card bad">
+      <h4><span class="mi mi-sm" style="color:var(--red)">warning</span> Where it struggles</h4>
+      <ul>
+        <li>Grayscale images — results are less intuitive</li>
+        <li>Large kernel on thin features destroys structure</li>
+        <li>Doesn't distinguish noise from real thin structures</li>
+        <li>Sensitive to threshold choice before binarization</li>
+        <li>Repeated iterations on complex shapes can merge objects</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ 06 PARAMETERS ═══════════════ -->
+<hr class="divider" /><section id="parameters" class="reveal">
+  <span class="section-tag">06 — Observations &amp; Parameters</span>
+  <h2 class="section-title">How <span>parameters</span> affect results</h2>
+  <p class="section-sub">
+    Each knob changes the output in a predictable, understandable way. Understanding these is key to applying morphology correctly in practice.
+  </p>
+
+  <table class="params-table">
+    <thead>
+      <tr>
+        <th>Parameter</th>
+        <th>Range</th>
+        <th>Effect on Output</th>
+        <th>Impact</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Operation Type</strong></td>
+        <td>Erosion / Dilation / Opening / Closing / …</td>
+        <td>Fundamental: shrinks vs grows vs compound effects. Choice completely changes output semantics.</td>
+        <td><span class="badge badge-both">Critical</span></td>
+      </tr>
+      <tr>
+        <td><strong>Kernel Shape</strong></td>
+        <td>Square, Cross, Disk, Diamond</td>
+        <td>Controls directionality — square affects diagonals, cross only cardinal directions, disk is isotropic (uniform in all directions).</td>
+        <td><span class="badge badge-both">High</span></td>
+      </tr>
+      <tr>
+        <td><strong>Kernel Radius</strong></td>
+        <td>1 – ∞ (typically 1–5)</td>
+        <td>Larger radius = stronger, more aggressive transformation. Small features may be destroyed. r=1 is usually safe for noise removal.</td>
+        <td><span class="badge badge-both">High</span></td>
+      </tr>
+      <tr>
+        <td><strong>Iterations</strong></td>
+        <td>1 – 10+</td>
+        <td>Applying N times ≈ applying with radius × N. Can fully erode thin structures in 2–3 iterations even with r=1.</td>
+        <td><span class="badge badge-up">Amplifies</span></td>
+      </tr>
+      <tr>
+        <td><strong>Polarity</strong></td>
+        <td>White=FG / Black=FG</td>
+        <td>Swaps which pixels are "object." Erosion on dark objects on bright bg = invert polarity. Useful for inverted images.</td>
+        <td><span class="badge badge-warn">Context</span></td>
+      </tr>
+      <tr>
+        <td><strong>Threshold</strong> (pre-step)</td>
+        <td>0 – 255</td>
+        <td>Determines what counts as foreground before binarization. Lower threshold = more white pixels → dilation appears stronger.</td>
+        <td><span class="badge badge-both">High</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Surprising observations -->
+  <div class="card card-accent" style="margin-top:1.5rem;">
+    <h3><span class="mi mi-sm" style="color:var(--accent)">lightbulb</span> What surprised us</h3>
+    <ul style="margin-top:0.6rem; padding-left:1.1rem; display:flex; flex-direction:column; gap:0.5rem;">
+      <li><strong>Opening ≠ Erosion:</strong> Opening selectively <em>removes</em> features smaller than the SE while approximately <em>restoring</em> the shape of larger objects — erosion just shrinks everything.</li>
+      <li><strong>Top Hat illumination trick:</strong> Top Hat (original − opened) highlights bright features on a non-uniform background — solving uneven lighting without any learned model.</li>
+      <li><strong>Shape matters more than size:</strong> A cross kernel radius-3 and square kernel radius-1 can produce very different edge effects even at similar computational cost.</li>
+      <li><strong>Binary vs grayscale differing intuitions:</strong> On grayscale, dilation picks local <em>maximum</em> and erosion picks local <em>minimum</em> — same SE, completely different interpretation.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ═══════════════ 07 TAKEAWAYS ═══════════════ -->
+<hr class="divider" /><section id="takeaways" class="reveal">
+  <span class="section-tag">07 — Takeaways</span>
+  <h2 class="section-title">Key <em>conclusions</em></h2>
+  <p class="section-sub">Morphological operations: surprisingly powerful for how simple they are.</p>
+
+  <div class="takeaway-list">
+    <div class="takeaway-item reveal">
+      <div class="takeaway-num">1</div>
+      <div>
+        <h4>Morphology = shape-aware filtering</h4>
+        <p>Unlike convolution blur which averages, morphological ops answer: "does this shape <em>FIT</em> or <em>HIT</em> here?" — making them perfectly suited for binary masks and geometric analysis.</p>
+      </div>
+    </div>
+    <div class="takeaway-item reveal">
+      <div class="takeaway-num">2</div>
+      <div>
+        <h4>Two primitives, infinite combinations</h4>
+        <p>Everything — Opening, Closing, Gradient, Top Hat, Skeletonize, Geodesic — is built from just Erosion and Dilation. Mastering these two gives you the whole family for free.</p>
+      </div>
+    </div>
+    <div class="takeaway-item reveal">
+      <div class="takeaway-num">3</div>
+      <div>
+        <h4>Parameter choice is domain knowledge</h4>
+        <p>There is no universal "best" kernel size. The right choice depends on the scale of features to preserve vs remove — it requires application insight, not just trial-and-error.</p>
+      </div>
+    </div>
+    <div class="takeaway-item reveal">
+      <div class="takeaway-num">4</div>
+      <div>
+        <h4>Responds to: edges, blobs, thin lines</h4>
+        <p>Gradient captures boundaries; Top Hat captures small bright blobs; Black Hat captures small dark blobs. It does NOT respond to gradients or textures directly — purely structural.</p>
+      </div>
+    </div>
+    <div class="takeaway-item reveal">
+      <div class="takeaway-num">5</div>
+      <div>
+        <h4>Still relevant in the deep learning era</h4>
+        <p>Morphological post-processing is standard in medical imaging, document layout analysis, and satellite imagery — zero learned parameters, fully interpretable, deterministic.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Final code reference -->
+  <div style="margin-top:2rem;">
+    <div style="font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); margin-bottom:0.6rem; display:flex; align-items:center; gap:0.4rem;"><span class="mi mi-sm">inventory_2</span> Quick Reference — Python + OpenCV</div>
+    <div class="code-block">
+<span class="kw">import</span> cv2, numpy <span class="kw">as</span> np
+
+<span class="cm"># Structuring elements</span>
+<span class="vr">kernel</span> = cv2.getStructuringElement(cv2.MORPH_RECT,    (<span class="nu">5</span>, <span class="nu">5</span>))  <span class="cm"># square</span>
+<span class="vr">kernel</span> = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (<span class="nu">5</span>, <span class="nu">5</span>))  <span class="cm"># disk</span>
+<span class="vr">kernel</span> = cv2.getStructuringElement(cv2.MORPH_CROSS,   (<span class="nu">5</span>, <span class="nu">5</span>))  <span class="cm"># cross</span>
+
+<span class="cm"># Primitives</span>
+<span class="vr">eroded</span>  = cv2.erode(img, kernel, iterations=<span class="nu">1</span>)
+<span class="vr">dilated</span> = cv2.dilate(img, kernel, iterations=<span class="nu">1</span>)
+
+<span class="cm"># Compound operations</span>
+<span class="vr">opened</span>   = cv2.morphologyEx(img, cv2.MORPH_OPEN,     kernel)
+<span class="vr">closed</span>   = cv2.morphologyEx(img, cv2.MORPH_CLOSE,    kernel)
+<span class="vr">gradient</span> = cv2.morphologyEx(img, cv2.MORPH_GRADIENT, kernel)
+<span class="vr">tophat</span>   = cv2.morphologyEx(img, cv2.MORPH_TOPHAT,   kernel)
+<span class="vr">blackhat</span> = cv2.morphologyEx(img, cv2.MORPH_BLACKHAT, kernel)
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>Vision AI · Workshop 6 · Morphological Operations · 2026</p>
+  <p style="margin-top:0.4rem; font-size:0.75rem;">
+    References: Gonzalez &amp; Woods (2002); Soille (1999);
+    <a href="https://towardsdatascience.com/understanding-morphological-image-processing-and-its-operations-7bcf1ed11756/" target="_blank">TDS Article</a>;
+    <a href="https://juliaimages.org/latest/examples/image_morphology/image_morphology/" target="_blank">JuliaImages</a>
+  </p>
+</footer>
+
+  <!-- Lightbox -->
+  <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+    <span class="lightbox-close">&times;</span>
+    <img id="lightbox-img" class="lightbox-content">
+  </div>
+
+<script src="script.js"></script>
+</body>
+</html>
