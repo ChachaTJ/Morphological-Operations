@@ -261,8 +261,8 @@ hr.divider { border: none; border-top: 1px solid var(--border); }
 .oc-top  { display: flex; justify-content: center; margin-bottom: 0.2rem; }
 .oc-mid  { display: flex; justify-content: space-between; gap: 1rem; margin-bottom: 0.2rem; }
 .oc-bot  { display: flex; justify-content: space-between; gap: 1rem; }
-.oc-node { flex: 1; min-width: 100px; }
-.oc-top .oc-node { max-width: 320px; }
+.oc-node { flex: 0 0 auto; width: 46%; min-width: 100px; }
+.oc-top .oc-node { max-width: 160px; width: 160px; align-self: center; }
 .oc-node canvas {
   border-radius: 8px; width: 100%; display: block;
   background: #111111; height: 80px; object-fit: contain;
