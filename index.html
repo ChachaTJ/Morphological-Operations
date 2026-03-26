@@ -60,7 +60,7 @@
     and broken edges. Morphological operations fix this using nothing more than a geometric probe.
   </p>
 
-  <div class="card-grid cols3" style="margin-bottom:2rem;">
+  <div class="card-grid cols3" style="margin-bottom:1rem;">
     <div class="card reveal">
       <div class="icon"><span class="mi mi-lg" style="color:var(--accent)">science</span></div>
       <h3>Noise Removal</h3>
@@ -78,19 +78,19 @@
     </div>
   </div>
 
-  <div class="motivation-grid reveal">
+  <div class="motivation-grid reveal" style="margin-top:1rem;">
     <div class="motivation-img-card">
       <img src="images/imageexample.png" alt="Text Processing Example" />
       <div class="img-caption">
         <h4><span class="mi mi-sm">text_fields</span> Text Manipulation</h4>
-        <p>Applying morphological effects to text can make it thicker (Dilation), thinner (Erosion), or leave only the outline (Gradient).</p>
+        <p>Dilation thickens text, Erosion thins it, Gradient extracts the outline.</p>
       </div>
     </div>
     <div class="motivation-img-card">
       <img src="images/Morphorlogical Operations.png" alt="Julia test patterns" />
       <div class="img-caption">
-        <h4><span class="mi mi-sm">grid_on</span> Classic Test Patterns (Julia)</h4>
-        <p>Hexagons, digits, circles, and stripes — each structure tests a different morphological behaviour. Used throughout this demo.</p>
+        <h4><span class="mi mi-sm">grid_on</span> Classic Test Patterns</h4>
+        <p>Hexagons, digits, circles — each structure tests a different morphological behaviour.</p>
       </div>
     </div>
   </div>
@@ -141,58 +141,66 @@
   </div>
 </section>
 
-<!-- ═══════════════ 03 OPERATIONS ═══════════════ -->
+<!-- ═══════════════ 03a OPERATIONS: EROSION & DILATION ═══════════════ -->
 <hr class="divider" /><section id="operations">
-  <span class="section-tag"><span class="mi mi-sm">functions</span> 03 — Operations</span>
-  <h2 class="section-title">The four <span>core operations</span></h2>
-  <p class="section-sub">Each operation sweeps a structuring element over every pixel and applies a simple geometric rule.</p>
+  <span class="section-tag"><span class="mi mi-sm">functions</span> 03 — Operations (1/2)</span>
+  <h2 class="section-title">The core <span>primitives</span></h2>
+  <p class="section-sub">Every morphological operation builds on two basic primitives sweeping a structuring element across the image.</p>
 
-  <!-- EROSION -->
-  <div class="op-showcase reveal">
-    <div class="op-showcase-title">Erosion</div>
-    <div class="op-canvas-row">
-      <div class="op-canvas-block">
-        <canvas id="ops-erosion-in"></canvas>
-        <div class="op-canvas-lbl">Input (Binary)</div>
+  <div class="op-two-col">
+    <!-- EROSION -->
+    <div class="op-showcase reveal">
+      <div class="op-showcase-title">Erosion</div>
+      <div class="op-canvas-row">
+        <div class="op-canvas-block">
+          <canvas id="ops-erosion-in"></canvas>
+          <div class="op-canvas-lbl">Input (Binary)</div>
+        </div>
+        <div class="op-arrow-big">→</div>
+        <div class="op-canvas-block">
+          <canvas id="ops-erosion-out"></canvas>
+          <div class="op-canvas-lbl">After Erosion</div>
+        </div>
       </div>
-      <div class="op-arrow-big">→</div>
-      <div class="op-canvas-block">
-        <canvas id="ops-erosion-out"></canvas>
-        <div class="op-canvas-lbl">After Erosion</div>
-      </div>
+      <ul class="op-bullet-list">
+        <li>Shrinks foreground objects</li>
+        <li>Removes small bright noise</li>
+        <li>Breaks thin connections</li>
+      </ul>
     </div>
-    <ul class="op-bullet-list">
-      <li>Shrinks foreground objects</li>
-      <li>Removes small bright noise</li>
-      <li>Breaks thin connections</li>
-      <li>Makes boundaries move inward</li>
-    </ul>
-  </div>
 
-  <!-- DILATION -->
-  <div class="op-showcase reveal">
-    <div class="op-showcase-title">Dilation</div>
-    <div class="op-canvas-row">
-      <div class="op-canvas-block">
-        <canvas id="ops-dilation-in"></canvas>
-        <div class="op-canvas-lbl">Input (Binary)</div>
+    <!-- DILATION -->
+    <div class="op-showcase reveal">
+      <div class="op-showcase-title">Dilation</div>
+      <div class="op-canvas-row">
+        <div class="op-canvas-block">
+          <canvas id="ops-dilation-in"></canvas>
+          <div class="op-canvas-lbl">Input (Binary)</div>
+        </div>
+        <div class="op-arrow-big">→</div>
+        <div class="op-canvas-block">
+          <canvas id="ops-dilation-out"></canvas>
+          <div class="op-canvas-lbl">After Dilation</div>
+        </div>
       </div>
-      <div class="op-arrow-big">→</div>
-      <div class="op-canvas-block">
-        <canvas id="ops-dilation-out"></canvas>
-        <div class="op-canvas-lbl">After Dilation</div>
-      </div>
+      <ul class="op-bullet-list">
+        <li>Expands foreground objects</li>
+        <li>Thickens shapes</li>
+        <li>Connects nearby components</li>
+      </ul>
     </div>
-    <ul class="op-bullet-list">
-      <li>Expands foreground objects</li>
-      <li>Thickens shapes</li>
-      <li>Connects nearby components</li>
-      <li>Makes boundaries move outward</li>
-    </ul>
   </div>
+</section>
+
+<!-- ═══════════════ 03b OPERATIONS: OPENING, CLOSING, GRADIENT ═══════════════ -->
+<hr class="divider" /><section id="operations2">
+  <span class="section-tag"><span class="mi mi-sm">functions</span> 03 — Operations (2/2)</span>
+  <h2 class="section-title">Compound <span>operations</span></h2>
+  <p class="section-sub">Built from Erosion and Dilation, these operations perform targeted clean-up and boundary extraction.</p>
 
   <!-- OPENING & CLOSING -->
   <div class="op-showcase reveal">
+
     <div class="op-showcase-title">Opening &amp; Closing</div>
     <div class="oc-diagram">
       <!-- Top: original -->
